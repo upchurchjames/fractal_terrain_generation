@@ -1,14 +1,19 @@
-precision highp float;
+function getFragmentShader() {
+  return `
 
-uniform sampler2D concrete;
+    precision highp float;
 
-varying vec2 vUV;
-varying vec3 incidentLight;
+    uniform sampler2D concrete;
 
-void main() {
-  vec3 concreteColor = texture2D(concrete, vUV).rgb;
+    varying vec2 vUV;
+    varying vec3 incidentLight;
 
-  vec3 color = incidentLight * concreteColor;
+    void main() {
+      vec3 concreteColor = texture2D(concrete, vUV).rgb;
 
-  gl_FragColor = vec4(color, 1.0);
+      vec3 color = incidentLight * concreteColor;
+
+      gl_FragColor = vec4(color, 1.0);
+    }
+  `;
 }

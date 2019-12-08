@@ -9,10 +9,12 @@
   <script src="https://threejs.org/examples/js/loaders/OBJLoader.js"></script>
 	<script src="https://threejs.org/examples/js/loaders/MTLLoader.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/dat-gui/0.7.6/dat.gui.min.js"></script>
-  <script src="./shaders/vertexShader.js" type="x-shader/x-vertex" id="vertexShader"></script>
-  <script src="./shaders/fragmentShader.js" type="x-shader/x-fragment" id="fragShader"></script>
+
+  <script src="./shaders/vertexShader.js" type="text/javascript"></script>
+  <script src="./shaders/fragmentShader.js" type="text/javascript"></script>
   <script src="./scripts/buildTree.js" type="text/javascript"></script>
   <script src="./scripts/terrain.js" type="text/javascript"></script>
+
   <script>
   "use strict";
 	let scene, camera, renderer, cameraControls;
@@ -57,14 +59,31 @@
       }
     }
 
+    let up = new THREE.Vector3(0, 1, 0);
+    let uniforms = {
+      upDirection: {
+        value: up
+      },
+      rock: {
+        type: "t",
+        value: textureLoader.load("./textures/rock2.jpg", function (texture) { render(); })
+      }
+    };
+
+    let material2 = new THREE.RawShaderMaterial({
+      fragmentShader: getFragmentShader(),
+      vertexShader: getVertexShader(),
+      uniforms: uniforms
+    });
+
     let material = new THREE.MeshBasicMaterial( { map: rock_texture });
-    let plane = new THREE.Mesh(geometry, material);
+    let plane = new THREE.Mesh(geometry, material2);
 
     plane.rotation.x = THREE.Math.degToRad(-90);
     plane.position.set(0, -10, 0);
     scene.add(plane);
 
-    scene.fog = new THREE.FogExp2(0xe3e1e1, .06);
+    //scene.fog = new THREE.FogExp2(0xe3e1e1, .06);
 
     setOriginalLocation(new THREE.Vector3(0, 0, 0));
     generateLSystem("F", 3);
@@ -117,5 +136,6 @@
 	init();
 	animate();
   </script>
+
 </body>
 </html>
