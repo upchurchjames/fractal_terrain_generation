@@ -56,11 +56,11 @@
       }
     }
 
-    let material = new THREE.MeshBasicMaterial( { map: trump_texture });
+    let material = new THREE.MeshBasicMaterial( { map: rock_texture });
     let plane = new THREE.Mesh(geometry, material);
 
     plane.rotation.x = THREE.Math.degToRad(-90);
-    plane.position.set(0, -30, -15);
+    plane.position.set(0, -10, 0);
     scene.add(plane);
 
     setOriginalLocation(new THREE.Vector3(0, 0, 0));
@@ -71,7 +71,7 @@
   }
 
 	function initCamera() {
-		camera = new THREE.PerspectiveCamera(50, WIDTH / HEIGHT, 1, 100);
+		camera = new THREE.PerspectiveCamera(50, WIDTH / HEIGHT, 1, 10000);
 		camera.position.set(0, 3.5, 5);
 		camera.lookAt(scene.position);
 		cameraControls = new THREE.OrbitControls (
