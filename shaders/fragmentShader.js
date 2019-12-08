@@ -3,15 +3,15 @@ function getFragmentShader() {
 
     precision highp float;
 
-    uniform sampler2D concrete;
+    uniform sampler2D rock;
 
     varying vec2 vUV;
     varying vec3 incidentLight;
 
     void main() {
-      vec3 concreteColor = texture2D(concrete, vUV).rgb;
+      vec3 rockColor = texture2D(rock, vUV).rgb;
 
-      vec3 color = incidentLight * concreteColor;
+      vec3 color = incidentLight * rockColor;
 
       gl_FragColor = vec4(color, 1.0);
     }

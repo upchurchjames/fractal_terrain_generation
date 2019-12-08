@@ -5,7 +5,7 @@
 </head>
 <body>
   <script src="https://threejs.org/build/three.min.js"></script>
-	<script src="https://threejs.org/examples/js/controls/FirstPersonControls.js"></script>
+  <script src="https://threejs.org/examples/js/controls/FirstPersonControls.js"></script>
   <script src="https://threejs.org/examples/js/loaders/OBJLoader.js"></script>
 	<script src="https://threejs.org/examples/js/loaders/MTLLoader.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/dat-gui/0.7.6/dat.gui.min.js"></script>
@@ -60,6 +60,7 @@
     }
 
     let up = new THREE.Vector3(0, 1, 0);
+    let sky = new THREE.Vector3(0.887, 0.879, 0.879);
     let uniforms = {
       upDirection: {
         value: up
@@ -67,6 +68,9 @@
       rock: {
         type: "t",
         value: textureLoader.load("./textures/rock2.jpg", function (texture) { render(); })
+      },
+      skyLight: {
+        value: sky
       }
     };
 
@@ -83,9 +87,14 @@
     plane.position.set(0, -10, 0);
     scene.add(plane);
 
+    let directionalLight = new THREE.DirectionalLight(
+			0xffffff, 1.0);
+		directionalLight.position.set(0, 30, 0).normalize();
+    directionalLight.target = plane;
+    scene.add(directionalLight)
     //scene.fog = new THREE.FogExp2(0xe3e1e1, .06);
 
-    setOriginalLocation(new THREE.Vector3(0, 0, 0));
+    initTree(new THREE.Vector3(0, 0, 0));
     generateLSystem("F", 3);
     let branches = getBranches();
     branches.every(branch => scene.add(branch));
