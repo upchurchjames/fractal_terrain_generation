@@ -1,6 +1,6 @@
 let terrain;
-let width = 100;
-let length = 100;
+let width = 256;
+let length = 256;
 let segmentLength = 512;
 
 //

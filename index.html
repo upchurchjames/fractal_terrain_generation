@@ -4,9 +4,8 @@
   <title>Fractals</title>
 </head>
 <body>
-  <h1 align="center">Fractals</h1>
   <script src="https://threejs.org/build/three.min.js"></script>
-	<script src="https://threejs.org/examples/js/controls/OrbitControls.js"></script>
+	<script src="https://threejs.org/examples/js/controls/FirstPersonControls.js"></script>
   <script src="https://threejs.org/examples/js/loaders/OBJLoader.js"></script>
 	<script src="https://threejs.org/examples/js/loaders/MTLLoader.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/dat-gui/0.7.6/dat.gui.min.js"></script>
@@ -21,6 +20,8 @@
 	let WIDTH  = window.innerWidth;
 	let HEIGHT = window.innerHeight;
 
+  var clock = new THREE.Clock();
+
 	function init() {
 		scene = new THREE.Scene();
 		initRenderer();
@@ -31,7 +32,7 @@
 	function initRenderer() {
 		renderer = new THREE.WebGLRenderer({ antialias: true });
 		renderer.setSize(WIDTH, HEIGHT);
-    renderer.setClearColor(0x888888, 1);
+    renderer.setClearColor(0xe3e1e1, 1);
 		document.body.appendChild(renderer.domElement);
 	}
 
@@ -43,7 +44,7 @@
     let trump_texture = textureLoader.load('./textures/trump-angry.jpg');
 
     let geometry = new THREE.PlaneGeometry(width, length, segmentLength, segmentLength);
-    let heightMap = TerrainGeneration(segmentLength, 20);
+    let heightMap = TerrainGeneration(segmentLength, 50);
     let index = 0;
 
     // set vertex heights based on height map
@@ -63,6 +64,8 @@
     plane.position.set(0, -10, 0);
     scene.add(plane);
 
+    scene.fog = new THREE.FogExp2(0xe3e1e1, .06);
+
     setOriginalLocation(new THREE.Vector3(0, 0, 0));
     generateLSystem("F", 3);
     let branches = getBranches();
@@ -71,27 +74,19 @@
   }
 
 	function initCamera() {
-		camera = new THREE.PerspectiveCamera(50, WIDTH / HEIGHT, 1, 10000);
+		camera = new THREE.PerspectiveCamera(50, WIDTH / HEIGHT, 1, 20000);
 		camera.position.set(0, 3.5, 5);
 		camera.lookAt(scene.position);
-		cameraControls = new THREE.OrbitControls (
+		cameraControls = new THREE.FirstPersonControls (
 			camera, renderer.domElement
 		);
-		cameraControls.addEventListener("change",
-			function(){
-				camera.updateProjectionMatrix();
-				render();
-			}
-		);
-	}
 
-	function render() {
-		renderer.render(scene, camera);
+		cameraControls.movementSpeed = 12;
+    cameraControls.lookSpeed = .08;
 	}
 
   function eventHandlers() {
     handleWindowResize();
-    handleCameraChange();
   }
 
 	function handleWindowResize(){
@@ -103,22 +98,24 @@
 				renderer.setSize(WIDTH,HEIGHT);
 				camera.aspect = WIDTH/HEIGHT;
 				camera.updateProjectionMatrix();
-				render();
+        cameraControls.handlResize();
+        render();
 			}
 		);
 	}
 
-  function handleCameraChange() {
-    cameraControls.addEventListener("change",
-      function() {
-        camera.updateProjectionMatrix();
-        render();
-      }
-    );
+  function animate() {
+    requestAnimationFrame( animate );
+    render();
+  }
+
+  function render() {
+    renderer.render(scene, camera);
+     cameraControls.update(clock.getDelta());
   }
 
 	init();
-	render();
+	animate();
   </script>
 </body>
 </html>
