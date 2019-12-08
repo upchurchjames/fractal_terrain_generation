@@ -55,7 +55,10 @@
     
     let index = 0;
 
-    generateLSystem("F", scene, 3);
+    setOriginalLocation(new THREE.Vector3(0, 0, 0));
+    generateLSystem("F", 3);
+    let branches = getBranches();
+    branches.every(branch => scene.add(branch));
 
   }
 

@@ -1,5 +1,5 @@
 let positionStack = [];
-let currentPosition = new THREE.Vector3(0, 0, 0);
+let currentPosition;
 let cylinderRadiusTop = .5;
 let cylinderRadiusBottom = .5;
 let cylinderHeight = 5;
@@ -7,8 +7,14 @@ let radialSegments = 32;
 let rules = { 
 				"F":"F[-F][+F][/F][*F]"
 			}
+let branches = [];
 
-function generateLSystem(axiom, scene, generation)
+function setOriginalLocation(location)
+{
+	currentPosition = location;
+}
+
+function generateLSystem(axiom, generation)
 {
 	if(generation <= 0)
 	{
@@ -22,19 +28,19 @@ function generateLSystem(axiom, scene, generation)
 		switch(axiom[i])
 		{
 			case "F":
-				createBranch(1, scene);
+				createBranch(1);
 			break;
 			case "-":
-				createBranch(2, scene);
+				createBranch(2);
 			break;
 			case "+":
-				createBranch(3, scene);
+				createBranch(3);
 			break;
 			case "/":
-				createBranch(4, scene);
+				createBranch(4);
 			break;
 			case "*":
-				createBranch(5, scene);
+				createBranch(5);
 			break;
 			case "[":
 				positionStack.push(currentPosition);
@@ -49,10 +55,10 @@ function generateLSystem(axiom, scene, generation)
 				
 	}
 
-	generateLSystem(newAxiom, scene, generation - 1);
+	generateLSystem(newAxiom, generation - 1);
 }
 
-function createBranch(direction, scene)
+function createBranch(direction)
 {
 	let branchGeometry = new THREE.CylinderGeometry(cylinderRadiusTop, cylinderRadiusBottom, cylinderHeight, radialSegments);
 	let branchMaterial = new THREE.MeshBasicMaterial({color: 0x32a952});
@@ -96,5 +102,10 @@ function createBranch(direction, scene)
     		branch = branch;
     }
 
-    scene.add(branch);
+    branches.push(branch);
+}
+
+function getBranches()
+{
+	return branches;
 }
