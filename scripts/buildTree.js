@@ -69,35 +69,35 @@ function createBranch(direction)
     {
     	case 1:
     		branch.material.color.setHex(0xff0000); // Red
-    		branch = branch.rotateX(Math.PI / 2);
-    		branch.position.set(branch.position.x, branch.position.y, branch.position.z + (cylinderHeight / 4));
-    		currentPosition = new THREE.Vector3(branch.position.x, branch.position.y, branch.position.z + (cylinderHeight / 4));
+    		//branch = branch.rotateY(Math.PI / 2);
+    		branch.position.set(branch.position.x, branch.position.y + (cylinderHeight / 4), branch.position.z);
+    		currentPosition = new THREE.Vector3(branch.position.x, branch.position.y + (cylinderHeight / 4), branch.position.z);
     	break;
     	case 2:
     		branch.material.color.setHex(0x0022ff); // Blue
-    		branch = branch.rotateX((Math.PI / 2) + (Math.PI / 3));
-    		branch.position.set(branch.position.x, branch.position.y - (cylinderHeight / 2), branch.position.z + (cylinderHeight / 2));
-    		currentPosition = new THREE.Vector3(branch.position.x, branch.position.y - (cylinderHeight / 2), branch.position.z + (cylinderHeight / 2));
-    	break;
-    	case 3:
-    		branch.material.color.setHex(0xfff200); // Yellow
-    		branch = branch.rotateX((Math.PI / 2) - (Math.PI / 3));
+    		branch = branch.rotateX((Math.PI / 3));
     		branch.position.set(branch.position.x, branch.position.y + (cylinderHeight / 2), branch.position.z + (cylinderHeight / 2));
     		currentPosition = new THREE.Vector3(branch.position.x, branch.position.y + (cylinderHeight / 2), branch.position.z + (cylinderHeight / 2));
     	break;
+    	case 3:
+    		branch.material.color.setHex(0xfff200); // Yellow
+    		branch = branch.rotateX(-(Math.PI / 3));
+    		branch.position.set(branch.position.x, branch.position.y + (cylinderHeight / 2), branch.position.z - (cylinderHeight / 2));
+    		currentPosition = new THREE.Vector3(branch.position.x, branch.position.y + (cylinderHeight / 2), branch.position.z - (cylinderHeight / 2));
+    	break;
     	case 4:
     		branch.material.color.setHex(0xb85fb8); // Purple
-    		branch = branch.rotateZ((Math.PI / 2));
-    		branch = branch.rotateX((Math.PI / 2) + (Math.PI / 3));
-    		branch.position.set(branch.position.x + (cylinderHeight / 2), branch.position.y, branch.position.z + (cylinderHeight / 2));
-    		currentPosition = new THREE.Vector3(branch.position.x + (cylinderHeight / 2), branch.position.y, branch.position.z + (cylinderHeight / 2));
+    		branch = branch.rotateZ(-(Math.PI / 3));
+    		branch = branch.rotateY((Math.PI / 2));
+    		branch.position.set(branch.position.x + (cylinderHeight / 2), branch.position.y + (cylinderHeight / 2), branch.position.z);
+    		currentPosition = new THREE.Vector3(branch.position.x + (cylinderHeight / 2), branch.position.y + (cylinderHeight / 2), branch.position.z);
     	break;
     	case 5:
     		branch.material.color.setHex(0x784c17); // Brown
-    		branch = branch.rotateZ((Math.PI / 2));
-    		branch = branch.rotateX((Math.PI / 2) - (Math.PI / 3));
-    		branch.position.set(branch.position.x - (cylinderHeight / 2), branch.position.y, branch.position.z + (cylinderHeight / 2));
-    		currentPosition = new THREE.Vector3(branch.position.x - (cylinderHeight / 2), branch.position.y, branch.position.z + (cylinderHeight / 2));
+    		branch = branch.rotateZ((Math.PI / 3));
+    		branch = branch.rotateY((Math.PI / 2));
+    		branch.position.set(branch.position.x - (cylinderHeight / 2), branch.position.y + (cylinderHeight / 2), branch.position.z);
+    		currentPosition = new THREE.Vector3(branch.position.x - (cylinderHeight / 2), branch.position.y + (cylinderHeight / 2), branch.position.z);
     	default:
     		branch = branch;
     }
