@@ -8,10 +8,14 @@ let rules = {
 				"F":"F[-F][+F][/F][*F]"
 			}
 let branches = [];
+let textureLoader;
+let barkTexture;
 
-function setOriginalLocation(location)
+function initTree(location)
 {
 	currentPosition = location;
+	textureLoader = new THREE.TextureLoader();
+    bark_texture = textureLoader.load('./textures/bark.jpg');
 }
 
 function generateLSystem(axiom, generation)
@@ -61,39 +65,38 @@ function generateLSystem(axiom, generation)
 function createBranch(direction)
 {
 	let branchGeometry = new THREE.CylinderGeometry(cylinderRadiusTop, cylinderRadiusBottom, cylinderHeight, radialSegments);
-	let branchMaterial = new THREE.MeshBasicMaterial({color: 0x32a952});
+	let branchMaterial = new THREE.MeshBasicMaterial( { map: bark_texture });
     let branch = new THREE.Mesh(branchGeometry, branchMaterial);
 
 	branch.position.set(currentPosition.x, currentPosition.y, currentPosition.z);
     switch(direction)
     {
     	case 1:
-    		branch.material.color.setHex(0xff0000); // Red
-    		//branch = branch.rotateY(Math.PI / 2);
+    		//branch.material.color.setHex(0xff0000); // Red
     		branch.position.set(branch.position.x, branch.position.y + (cylinderHeight / 4), branch.position.z);
     		currentPosition = new THREE.Vector3(branch.position.x, branch.position.y + (cylinderHeight / 4), branch.position.z);
     	break;
     	case 2:
-    		branch.material.color.setHex(0x0022ff); // Blue
+    		//branch.material.color.setHex(0x0022ff); // Blue
     		branch = branch.rotateX((Math.PI / 3));
     		branch.position.set(branch.position.x, branch.position.y + (cylinderHeight / 2), branch.position.z + (cylinderHeight / 2));
     		currentPosition = new THREE.Vector3(branch.position.x, branch.position.y + (cylinderHeight / 2), branch.position.z + (cylinderHeight / 2));
     	break;
     	case 3:
-    		branch.material.color.setHex(0xfff200); // Yellow
+    		//branch.material.color.setHex(0xfff200); // Yellow
     		branch = branch.rotateX(-(Math.PI / 3));
     		branch.position.set(branch.position.x, branch.position.y + (cylinderHeight / 2), branch.position.z - (cylinderHeight / 2));
     		currentPosition = new THREE.Vector3(branch.position.x, branch.position.y + (cylinderHeight / 2), branch.position.z - (cylinderHeight / 2));
     	break;
     	case 4:
-    		branch.material.color.setHex(0xb85fb8); // Purple
+    		//branch.material.color.setHex(0xb85fb8); // Purple
     		branch = branch.rotateZ(-(Math.PI / 3));
     		branch = branch.rotateY((Math.PI / 2));
     		branch.position.set(branch.position.x + (cylinderHeight / 2), branch.position.y + (cylinderHeight / 2), branch.position.z);
     		currentPosition = new THREE.Vector3(branch.position.x + (cylinderHeight / 2), branch.position.y + (cylinderHeight / 2), branch.position.z);
     	break;
     	case 5:
-    		branch.material.color.setHex(0x784c17); // Brown
+    		//branch.material.color.setHex(0x784c17); // Brown
     		branch = branch.rotateZ((Math.PI / 3));
     		branch = branch.rotateY((Math.PI / 2));
     		branch.position.set(branch.position.x - (cylinderHeight / 2), branch.position.y + (cylinderHeight / 2), branch.position.z);
