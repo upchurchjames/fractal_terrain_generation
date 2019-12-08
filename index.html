@@ -10,9 +10,124 @@
   <script src="https://threejs.org/examples/js/loaders/OBJLoader.js"></script>
 	<script src="https://threejs.org/examples/js/loaders/MTLLoader.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/dat-gui/0.7.6/dat.gui.min.js"></script>
-  <script src="./shaders/vertexShader.js" type="x-shader/x-vertex" id="vertexShader"></script>
-  <script src="./shaders/fragmentShader.js" type="x-shader/x-fragment" id="fragShader"></script>
-  <script src="./diamondsquare.js"></script>
-  <script src="./terrain.js"></script>
+  <script type="x-shader/x-vertex" id="vertexShader">
+
+
+  </script>
+  <script type="x-shader/x-fragment" id="fragShader">
+
+
+  </script>
+
+
+  <script>
+	"use strict";
+	let scene, camera, renderer, cameraControls;
+  let object, coffeecup, objectRotation;
+  let keyLight, fillLight, backLight;
+
+  let width = 10;
+  let length = 10;
+  let segmentLength = 1;
+
+	let WIDTH  = window.innerWidth;
+	let HEIGHT = window.innerHeight;
+
+	function init() {
+		scene = new THREE.Scene();
+		initRenderer();
+		initScene();
+    eventHandlers();
+	}
+
+	function initRenderer() {
+		renderer = new THREE.WebGLRenderer({ antialias: true });
+		renderer.setSize(WIDTH, HEIGHT);
+    renderer.setClearColor(0x888888, 1);
+		document.body.appendChild(renderer.domElement);
+	}
+
+	function initScene() {
+
+		initCamera();
+    let textureLoader = new THREE.TextureLoader();
+    let geometry = new THREE.PlaneGeometry(width, length, segmentLength, segmentLength);
+    let index = 0;
+
+    for (var i = 0; i < width; i++)
+    {
+      for (var j = 0; j < length; j++)
+      {
+        console.log(geometry.vertices[index]);
+        //geometry.vertices[index].z = Math.floor(Math.random() * 3.0);  //terrain[i][j];
+        index++;
+      }
+    }
+
+    let wireframe = new THREE.WireframeGeometry( geometry );
+    let material = new THREE.MeshBasicMaterial( { color: 0xffff00, side: THREE.DoubleSide} );
+    let plane = new THREE.Mesh(geometry, material);
+    let line = new THREE.LineSegments( wireframe );
+
+    line.material.depthTest = false;
+    line.material.opacity = 0.25;
+    line.material.transparent = true;
+
+
+
+    scene.add(line);
+    scene.add(plane);
+  }
+
+	function initCamera() {
+		camera = new THREE.PerspectiveCamera(50, WIDTH / HEIGHT, 1, 100);
+		camera.position.set(0, 3.5, 5);
+		camera.lookAt(scene.position);
+		cameraControls = new THREE.OrbitControls (
+			camera, renderer.domElement
+		);
+		cameraControls.addEventListener("change",
+			function(){
+				camera.updateProjectionMatrix();
+				render();
+			}
+		);
+	}
+
+	function render() {
+		renderer.render(scene, camera);
+	}
+
+  function eventHandlers() {
+    handleWindowResize();
+    handleCameraChange();
+  }
+
+	function handleWindowResize(){
+		window.addEventListener (
+			"resize",
+			function () {
+				WIDTH = window.innerWidth ;
+				HEIGHT = window.innerHeight;
+				renderer.setSize(WIDTH,HEIGHT);
+				camera.aspect = WIDTH/HEIGHT;
+				camera.updateProjectionMatrix();
+				render();
+			}
+		);
+	}
+
+  function handleCameraChange() {
+    cameraControls.addEventListener("change",
+      function() {
+        camera.updateProjectionMatrix();
+        render();
+      }
+    );
+  }
+
+	init();
+	render();
+	</script>
 </body>
 </html>
