@@ -4,13 +4,52 @@ let object, objectRotation;
 let keyLight, fillLight, backLight;
 let terrain;
 
-let width = 50;
-let length = 50;
-let segmentLength = 64;
+let width = 100;
+let length = 100;
+let segmentLength = 512;
 
 let WIDTH  = window.innerWidth;
 let HEIGHT = window.innerHeight;
 
+var clock = new THREE.Clock();
+//
+// function vertexShader() {
+//   return `
+//     precision highp float;
+//
+//     attribute mat4 projectionMatrix;
+//     attribute mat4 modelViewMatrix;
+//     attribute vec3 position;
+//     attribute vec3 normal;
+//     attribute vec2 uv;
+//
+//     varying vec2 vUV;
+//
+//     void main() {
+//       vUV = uv;
+//       vec4 modelViewPosition = modelViewMatrix * vec4(position, 1.0);
+//
+//       gl_Position = projectionMatrix * modelViewPosition;
+//     }
+//   `;
+// }
+//
+// function fragmentShader() {
+//   return `
+//     precision highp float;
+//
+//     uniform sampler2D rock;
+//     uniform sampler2D grass;
+//     uniform sampler2D snow;
+//
+//     varying vec2 vUV;
+//
+//     void main() {
+//
+//       gl_FragColor = vec4(.5, .4, 0, 1.0);
+//     }
+//   `;
+// }
 
 function init() {
   scene = new THREE.Scene();
@@ -19,10 +58,15 @@ function init() {
   eventHandlers();
 }
 
+function animate() {
+	requestAnimationFrame( animate );
+	render();
+}
+
 function initRenderer() {
   renderer = new THREE.WebGLRenderer({ antialias: true });
   renderer.setSize(WIDTH, HEIGHT);
-  renderer.setClearColor(0x888888, 1);
+  renderer.setClearColor(0xe3e1e1, 1);
   document.body.appendChild(renderer.domElement);
 }
 
@@ -30,27 +74,33 @@ function initScene() {
 
   initCamera();
   let textureLoader = new THREE.TextureLoader();
-  let rock_texture = textureLoader.load('./textures/rock.jpg');
+  let rock_texture = textureLoader.load('./textures/rock2.jpg');
   let grass_texture = textureLoader.load('./textures/grass.jpg');
-  let sky_background = textureLoader.load('./textures/sky.jpg', (texture) => {scene.background = texture;});
+  let snow_texture = textureLoader.load('./textures/snow.jpg');
+  let trump_texture = textureLoader.load('./textures/trump-angry.jpg');
+
   let geometry = new THREE.PlaneGeometry(width, length, segmentLength, segmentLength);
   let index = 0;
-  let heightMap = TerrainGeneration(segmentLength, 15)
+  let heightMap = TerrainGeneration(segmentLength, 20)
 
-  let up = new THREE.Vector3(0,1,0);
-  let uniforms = {
-    upDirection: {
-      value: up
-    },
-    rock: {
-      type: "t",
-      value: new THREE.TextureLoader().load("./textures/rock.jpg", function(texture){render();})
-    },
-    grass: {
-      type: "t",
-      value: new THREE.TextureLoader().load("./textures/grass.jpg", function(texture){render();})
-    }
-  };
+  // let up = new THREE.Vector3(0,1,0);
+  // let uniforms = {
+  //   upDirection: {
+  //     value: up
+  //   },
+  //   rock: {
+  //     type: "t",
+  //     value: new THREE.TextureLoader().load("./textures/rock.jpg", function(texture){render();})
+  //   },
+  //   grass: {
+  //     type: "t",
+  //     value: new THREE.TextureLoader().load("./textures/grass.jpg", function(texture){render();})
+  //   },
+  //   snow: {
+  //     type: "t",
+  //     value: new THREE.TextureLoader().load("./textures/snow.jpg", function(texture){render();})
+  //   }
+  // };
 
   for(var i = 0; i <= segmentLength; i++)
   {
@@ -61,16 +111,20 @@ function initScene() {
     }
   }
 
-  let material = new THREE.MeshBasicMaterial( { map: grass_texture } );
+  let material = new THREE.MeshBasicMaterial( { map: trump_texture } );
 
-  let material2 = new THREE.RawShaderMaterial({
-    fragmentShader: document.getElementById('fragShader').textContent,
-    vertexShader:   document.getElementById('vertexShader').textContent,
-    uniforms: uniforms
-  });
+  // let material2 = new THREE.RawShaderMaterial({
+  //   fragmentShader: fragmentShader(),
+  //   vertexShader:   vertexShader(),
+  //   uniforms: uniforms
+  // });
 
   let plane = new THREE.Mesh(geometry, material);
-  scene.fog = new THREE.FogExp2(0xffffff, .02);
+
+  plane.rotation.x = THREE.Math.degToRad(-90);
+
+  plane.position.set(0, -30, -15);
+  scene.fog = new THREE.FogExp2(0xe3e1e1, .06);
 
 
   scene.add(plane);
@@ -78,26 +132,24 @@ function initScene() {
 
 function initCamera() {
   camera = new THREE.PerspectiveCamera(50, WIDTH / HEIGHT, 1, 100000);
-  camera.position.set(0, 5, 5);
+  camera.position.set(.5, 5, 5);
   camera.lookAt(scene.position);
-  cameraControls = new THREE.OrbitControls (
+  cameraControls = new THREE.FirstPersonControls (
     camera, renderer.domElement
   );
-  cameraControls.addEventListener("change",
-    function(){
-      camera.updateProjectionMatrix();
-      render();
-    }
-  );
+
+  //camera control properties
+  cameraControls.movementSpeed = 3;
+  cameraControls.lookSpeed = 0.05;
 }
 
 function render() {
+  cameraControls.update(clock.getDelta());
   renderer.render(scene, camera);
 }
 
 function eventHandlers() {
   handleWindowResize();
-  handleCameraChange();
 }
 
 function handleWindowResize(){
@@ -109,15 +161,8 @@ function handleWindowResize(){
       renderer.setSize(WIDTH,HEIGHT);
       camera.aspect = WIDTH/HEIGHT;
       camera.updateProjectionMatrix();
-      render();
-    }
-  );
-}
 
-function handleCameraChange() {
-  cameraControls.addEventListener("change",
-    function() {
-      camera.updateProjectionMatrix();
+      cameraControls.handleResize();
       render();
     }
   );
@@ -127,7 +172,7 @@ function TerrainGeneration(segments, smoothingFactor) {
 	let terrain = new Array();
 
 	// internal functions
-	_init = function() {
+	var _init = function() {
 		terrain = new Array();
 		for(var i = 0; i <= segments; i++) {
 			terrain[i] = new Array();
@@ -187,4 +232,4 @@ function TerrainGeneration(segments, smoothingFactor) {
 };
 
 init();
-render();
+animate();
