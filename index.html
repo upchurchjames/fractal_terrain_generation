@@ -6,12 +6,117 @@
 <body>
   <h1 align="center">Fractals</h1>
   <script src="https://threejs.org/build/three.min.js"></script>
-	<script src="https://threejs.org/examples/js/controls/FirstPersonControls.js"></script>
+	<script src="https://threejs.org/examples/js/controls/OrbitControls.js"></script>
   <script src="https://threejs.org/examples/js/loaders/OBJLoader.js"></script>
 	<script src="https://threejs.org/examples/js/loaders/MTLLoader.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/dat-gui/0.7.6/dat.gui.min.js"></script>
   <script src="./shaders/vertexShader.js" type="x-shader/x-vertex" id="vertexShader"></script>
   <script src="./shaders/fragmentShader.js" type="x-shader/x-fragment" id="fragShader"></script>
-  <script src="./terrain.js"></script>
+  <script src="./scripts/buildTree.js" type="text/javascript"></script>
+  <script src="./scripts/terrain.js" type="text/javascript"></script>
+  <script>
+  "use strict";
+	let scene, camera, renderer, cameraControls;
+
+	let WIDTH  = window.innerWidth;
+	let HEIGHT = window.innerHeight;
+
+	function init() {
+		scene = new THREE.Scene();
+		initRenderer();
+		initScene();
+    eventHandlers();
+	}
+
+	function initRenderer() {
+		renderer = new THREE.WebGLRenderer({ antialias: true });
+		renderer.setSize(WIDTH, HEIGHT);
+    renderer.setClearColor(0x888888, 1);
+		document.body.appendChild(renderer.domElement);
+	}
+
+	function initScene() {
+
+		initCamera();
+    let textureLoader = new THREE.TextureLoader();
+
+    let geometry = new THREE.PlaneGeometry(width, length, segmentLength, segmentLength);
+    let heightMap = TerrainGeneration(segmentLength, 20);
+    let index = 0;
+
+    // set vertex heights based on height map
+    for (var i = 0; i <= segmentLength; i++)
+    {
+      for (var j = 0; j <= segmentLength; j++)
+      {
+        geometry.vertices[index].z = heightMap[i][j];
+        index++;
+      }
+    }
+
+    let material = new THREE.MeshBasicMaterial( { color: 0xff0000 } );
+    let plane = new THREE.Mesh(geometry, material);
+
+    plane.rotation.x = THREE.Math.degToRad(-90);
+    plane.position.set(0, -30, -15);
+    scene.add(plane);
+
+    setOriginalLocation(new THREE.Vector3(0, 0, 0));
+    generateLSystem("F", 3);
+    let branches = getBranches();
+    branches.every(branch => scene.add(branch));
+
+  }
+
+	function initCamera() {
+		camera = new THREE.PerspectiveCamera(50, WIDTH / HEIGHT, 1, 100);
+		camera.position.set(0, 3.5, 5);
+		camera.lookAt(scene.position);
+		cameraControls = new THREE.OrbitControls (
+			camera, renderer.domElement
+		);
+		cameraControls.addEventListener("change",
+			function(){
+				camera.updateProjectionMatrix();
+				render();
+			}
+		);
+	}
+
+	function render() {
+		renderer.render(scene, camera);
+	}
+
+  function eventHandlers() {
+    handleWindowResize();
+    handleCameraChange();
+  }
+
+	function handleWindowResize(){
+		window.addEventListener (
+			"resize",
+			function () {
+				WIDTH = window.innerWidth ;
+				HEIGHT = window.innerHeight;
+				renderer.setSize(WIDTH,HEIGHT);
+				camera.aspect = WIDTH/HEIGHT;
+				camera.updateProjectionMatrix();
+				render();
+			}
+		);
+	}
+
+  function handleCameraChange() {
+    cameraControls.addEventListener("change",
+      function() {
+        camera.updateProjectionMatrix();
+        render();
+      }
+    );
+  }
+
+	init();
+	render();
+  </script>
 </body>
 </html>
