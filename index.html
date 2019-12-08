@@ -39,6 +39,8 @@
 
 		initCamera();
     let textureLoader = new THREE.TextureLoader();
+    let rock_texture = textureLoader.load('./textures/rock2.jpg');
+    let trump_texture = textureLoader.load('./textures/trump-angry.jpg');
 
     let geometry = new THREE.PlaneGeometry(width, length, segmentLength, segmentLength);
     let heightMap = TerrainGeneration(segmentLength, 20);
@@ -54,7 +56,7 @@
       }
     }
 
-    let material = new THREE.MeshBasicMaterial( { color: 0xff0000 } );
+    let material = new THREE.MeshBasicMaterial( { map: trump_texture });
     let plane = new THREE.Mesh(geometry, material);
 
     plane.rotation.x = THREE.Math.degToRad(-90);
