@@ -1,0 +1,113 @@
+<!doctype html>
+<html>
+<head>
+  <title>Fractals</title>
+</head>
+<body>
+  <h1 align="center">Fractals</h1>
+  <script src="https://threejs.org/build/three.min.js"></script>
+	<script src="https://threejs.org/examples/js/controls/OrbitControls.js"></script>
+  <script src="https://threejs.org/examples/js/loaders/OBJLoader.js"></script>
+	<script src="https://threejs.org/examples/js/loaders/MTLLoader.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/dat-gui/0.7.6/dat.gui.min.js"></script>
+  <script src="./buildTree.js" type="text/javascript"></script>
+  <script type="x-shader/x-vertex" id="vertexShader">
+
+
+  </script>
+  <script type="x-shader/x-fragment" id="fragShader">
+
+
+  </script>
+
+
+  <script>
+	"use strict";
+	let scene, camera, renderer, cameraControls;
+  let object, coffeecup, objectRotation;
+  let keyLight, fillLight, backLight;
+
+  let width = 10;
+  let length = 10;
+  let segmentLength = 1;
+
+	let WIDTH  = window.innerWidth;
+	let HEIGHT = window.innerHeight;
+
+	function init() {
+		scene = new THREE.Scene();
+		initRenderer();
+		initScene();
+    eventHandlers();
+	}
+
+	function initRenderer() {
+		renderer = new THREE.WebGLRenderer({ antialias: true });
+		renderer.setSize(WIDTH, HEIGHT);
+    renderer.setClearColor(0x888888, 1);
+		document.body.appendChild(renderer.domElement);
+	}
+
+	function initScene() {
+
+		initCamera();
+    let textureLoader = new THREE.TextureLoader();
+    
+    let index = 0;
+
+    generateLSystem("F", scene, 3);
+
+  }
+
+	function initCamera() {
+		camera = new THREE.PerspectiveCamera(50, WIDTH / HEIGHT, 1, 100);
+		camera.position.set(0, 3.5, 5);
+		camera.lookAt(scene.position);
+		cameraControls = new THREE.OrbitControls (
+			camera, renderer.domElement
+		);
+		cameraControls.addEventListener("change",
+			function(){
+				camera.updateProjectionMatrix();
+				render();
+			}
+		);
+	}
+
+	function render() {
+		renderer.render(scene, camera);
+	}
+
+  function eventHandlers() {
+    handleWindowResize();
+    handleCameraChange();
+  }
+
+	function handleWindowResize(){
+		window.addEventListener (
+			"resize",
+			function () {
+				WIDTH = window.innerWidth ;
+				HEIGHT = window.innerHeight;
+				renderer.setSize(WIDTH,HEIGHT);
+				camera.aspect = WIDTH/HEIGHT;
+				camera.updateProjectionMatrix();
+				render();
+			}
+		);
+	}
+
+  function handleCameraChange() {
+    cameraControls.addEventListener("change",
+      function() {
+        camera.updateProjectionMatrix();
+        render();
+      }
+    );
+  }
+
+	init();
+	render();
+	</script>
+</body>
+</html>
