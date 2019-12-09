@@ -44,6 +44,7 @@
     let textureLoader = new THREE.TextureLoader();
     let rock_texture = textureLoader.load('./textures/rock2.jpg', function (texture) { render(); });
     let grass_texture = textureLoader.load('./textures/grass.jpg', function (texture) { render(); });
+    let snow_texture = textureLoader.load('./textures/snow.jpg', function (texture) { render(); });
 
     let trump_texture = textureLoader.load('./textures/trump-angry.jpg', function (texture) { render(); });
 
@@ -66,6 +67,10 @@
     let uniforms = {
       upDirection: {
         value: up
+      },
+      snow: {
+        type: "t",
+        value: snow_texture
       },
       rock: {
         type: "t",
@@ -94,8 +99,8 @@
     scene.add(plane);
 
     let directionalLight = new THREE.DirectionalLight(
-			0xffffff, 1.0);
-		directionalLight.position.set(0, 30, 0).normalize();
+			0xffffff,.9);
+		directionalLight.position.set(0, 50, 0).normalize();
     directionalLight.target = plane;
     scene.add(directionalLight)
     //scene.fog = new THREE.FogExp2(0xe3e1e1, .06);
