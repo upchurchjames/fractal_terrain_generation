@@ -15,6 +15,7 @@ function getVertexShader() {
 
     varying vec2 vUV;
     varying vec3 incidentLight;
+    varying vec3 vertexPosition;
 
     void main() {
       vec3 worldNormal = normalize(vec3(vec4(normal, 0.0) * modelMatrix));
@@ -23,6 +24,7 @@ function getVertexShader() {
       float w = 0.5 * (1.0 + dot(up, worldNormal));
 
       incidentLight = w * skyLight;
+      vertexPosition = position;
 
       gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
     }

@@ -42,8 +42,10 @@
 
 		initCamera();
     let textureLoader = new THREE.TextureLoader();
-    let rock_texture = textureLoader.load('./textures/rock2.jpg');
-    let trump_texture = textureLoader.load('./textures/trump-angry.jpg');
+    let rock_texture = textureLoader.load('./textures/rock2.jpg', function (texture) { render(); });
+    let grass_texture = textureLoader.load('./textures/grass.jpg', function (texture) { render(); });
+
+    let trump_texture = textureLoader.load('./textures/trump-angry.jpg', function (texture) { render(); });
 
     let geometry = new THREE.PlaneGeometry(width, length, segmentLength, segmentLength);
     let heightMap = TerrainGeneration(segmentLength, 50);
@@ -67,7 +69,11 @@
       },
       rock: {
         type: "t",
-        value: textureLoader.load("./textures/rock2.jpg", function (texture) { render(); })
+        value: rock_texture
+      },
+      grass: {
+        type: "t",
+        value: grass_texture
       },
       skyLight: {
         value: sky
@@ -126,7 +132,7 @@
 				renderer.setSize(WIDTH,HEIGHT);
 				camera.aspect = WIDTH/HEIGHT;
 				camera.updateProjectionMatrix();
-        cameraControls.handlResize();
+        cameraControls.handleResize();
         render();
 			}
 		);
