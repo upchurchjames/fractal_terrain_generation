@@ -1,7 +1,7 @@
 let positionStack = [];
 let currentPosition;
-let cylinderRadiusTop = .5;
-let cylinderRadiusBottom = .5;
+let cylinderRadiusTop = .2;
+let cylinderRadiusBottom = .2;
 let cylinderHeight = 5.0;
 let radialSegments = 32.0;
 let rules = { 
@@ -67,11 +67,7 @@ function generateLSystem(axiom, generation)
 
 	generateLSystem(newAxiom, generation - 1);
 }
-// "F[-F][+F][/F][*F]"
-// "[-F[-F][+F][/F][*F]]"
-// "[+F[-F][+F][/F][*F]]"
-// "[/F[-F][+F][/F][*F]]"
-// "[*F[-F][+F][/F][*F]]"
+
 function createBranch(direction)
 {
 	let branchGeometry;
@@ -89,34 +85,59 @@ function createBranch(direction)
     {
     	case 1:
     		branch.material.color.setHex(0xff0000); // Red
-    		branch.position.set(branch.position.x, branch.position.y + (cylinderHeight / 2.0), branch.position.z);
-    		currentPosition = new THREE.Vector3(branch.position.x, branch.position.y + (cylinderHeight / 2.0), branch.position.z);
+
+    		var x = branch.position.x;
+    		var y = branch.position.y + (cylinderHeight / 2.0);
+    		var z = branch.position.z;
+
+    		branch.position.set(x, y, z);
+    		currentPosition = new THREE.Vector3(x, y, z);
     	break;
     	case 2:
     		branch.material.color.setHex(0x0022ff); // Blue
+
+    		var x = branch.position.x;
+    		var y = branch.position.y + (cylinderHeight / 2.0);
+    		var z = branch.position.z + ((cylinderHeight / 2.0) * Math.tan((Math.PI / 2) - angle));
+
     		branch = branch.rotateX(angle);
-    		branch.position.set(branch.position.x, branch.position.y + (cylinderHeight / 2.0), branch.position.z + ((cylinderHeight / 2.0) * Math.tan((Math.PI / 2) - angle)));
-    		currentPosition = new THREE.Vector3(branch.position.x, branch.position.y + (cylinderHeight / 2.0), branch.position.z + ((cylinderHeight / 2.0) * Math.tan((Math.PI / 2) - angle)));
+    		branch.position.set(x, y, z);
+    		currentPosition = new THREE.Vector3(x, y, z);
     	break;
     	case 3:
     		branch.material.color.setHex(0xfff200); // Yellow
+
+    		var x = branch.position.x;
+    		var y = branch.position.y + (cylinderHeight / 2.0);
+    		var z = branch.position.z - ((cylinderHeight / 2.0) * Math.tan((Math.PI / 2) - angle));
+
     		branch = branch.rotateX(-(Math.PI / 3.0));
-    		branch.position.set(branch.position.x, branch.position.y + (cylinderHeight / 2.0), branch.position.z - ((cylinderHeight / 2.0) * Math.tan((Math.PI / 2) - angle)));
-    		currentPosition = new THREE.Vector3(branch.position.x, branch.position.y + (cylinderHeight / 2.0), branch.position.z - ((cylinderHeight / 2.0) * Math.tan((Math.PI / 2) - angle)));
+    		branch.position.set(x, y, z);
+    		currentPosition = new THREE.Vector3(x, y, z);
     	break;
     	case 4:
     		branch.material.color.setHex(0xb85fb8); // Purple
+
+    		var x = branch.position.x + ((cylinderHeight / 2.0) * Math.tan((Math.PI / 2) - angle));
+    		var y = branch.position.y + (cylinderHeight / 2.0);
+    		var z = branch.position.z;
+
     		branch = branch.rotateZ(-(Math.PI / 3.0));
     		branch = branch.rotateY((Math.PI / 2.0));
-    		branch.position.set(branch.position.x + ((cylinderHeight / 2.0) * Math.tan((Math.PI / 2) - angle)), branch.position.y + (cylinderHeight / 2.0), branch.position.z);
-    		currentPosition = new THREE.Vector3(branch.position.x + ((cylinderHeight / 2.0) * Math.tan((Math.PI / 2) - angle)), branch.position.y + (cylinderHeight / 2.0), branch.position.z);
+    		branch.position.set(x, y, z);
+    		currentPosition = new THREE.Vector3(x, y, z);
     	break;
     	case 5:
     		branch.material.color.setHex(0x784c17); // Brown
+
+    		var x = branch.position.x - ((cylinderHeight / 2.0) * Math.tan((Math.PI / 2) - angle));
+    		var y = branch.position.y + (cylinderHeight / 2.0);
+    		var z = branch.position.z;
+
     		branch = branch.rotateZ((Math.PI / 3.0));
     		branch = branch.rotateY((Math.PI / 2.0));
-    		branch.position.set(branch.position.x - ((cylinderHeight / 2.0) * Math.tan((Math.PI / 2) - angle)), branch.position.y + (cylinderHeight / 2.0), branch.position.z);
-    		currentPosition = new THREE.Vector3(branch.position.x - ((cylinderHeight / 2.0) * Math.tan((Math.PI / 2) - angle)), branch.position.y + (cylinderHeight / 2.0), branch.position.z);
+    		branch.position.set(x, y, z);
+    		currentPosition = new THREE.Vector3(x, y, z);
     	default:
     		branch = branch;
     }
