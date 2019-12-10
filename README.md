@@ -28,6 +28,8 @@ As the algorithm finishes execution, it will return a two-dimensional array that
 # Lindenmayer System
 The project will also demonstrate the population of that landscape with fractally generated trees. These trees will be separated by a certain distance so that they do not interfere. They will also reference the height map of the landscape as most trees or plants must be close to the soil to grow.
 
+The Lindenmayer system is used to replace characters of a string with another string. For example, the start string could be "F" and there is a rule for F, "F -> F[-F][+F]". Any "F" in the given string will be replaced by "F[-F][+F]". Each character can be given an instruction to draw a certain structure. "F" could stand for draw a line forward. A certain number of generations can be specified for the number of times the current string is traversed for rules to replace the specified characters. The instructions are not executed until the final generation. After the final string is traversed and all of the instructions are executed, the algorithm finishes.
+
 # Resources
 Free images from pexels.com for the texture of the trees, plants, and landscape will be used in this project
 
