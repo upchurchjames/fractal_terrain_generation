@@ -35,48 +35,53 @@ function initTree(location)
 
 function generateLSystem(axiom, generation)
 {
+	var newAxiom = "";
+	var i;
+
 	if(generation <= 0)
 	{
+		for(i = 0; i < axiom.length; i++)
+		{
+			switch(axiom[i])
+			{
+				case "F":
+					createBranch(1);
+				break;
+				case "-":
+					createBranch(2);
+				break;
+				case "+":
+					createBranch(3);
+				break;
+				case "/":
+					createBranch(4);
+				break;
+				case "*":
+					createBranch(5);
+				break;
+				case "[":
+					positionStack.push((new THREE.Vector3(0,0,0)).copy(currentPosition));
+					rotationStack.push((new THREE.Euler(0, 0, 0, 'XYZ')).copy(rotation));
+					translationStack.push((new THREE.Vector3(0,0,0)).copy(translation));
+				break;
+				case "]":
+					currentPosition = positionStack.pop();
+					rotation = rotationStack.pop();
+					translation = translationStack.pop();
+					break;
+				default:
+					currentPosition = currentPosition;
+			}
+
+		}
+
 		return;
 	}
 
-	var newAxiom = "";
-	var i;
+	
 	for(i = 0; i < axiom.length; i++)
 	{
-		switch(axiom[i])
-		{
-			case "F":
-				createBranch(1);
-			break;
-			case "-":
-				createBranch(2);
-			break;
-			case "+":
-				createBranch(3);
-			break;
-			case "/":
-				createBranch(4);
-			break;
-			case "*":
-				createBranch(5);
-			break;
-			case "[":
-				positionStack.push((new THREE.Vector3(0,0,0)).copy(currentPosition));
-				rotationStack.push((new THREE.Euler(0, 0, 0, 'XYZ')).copy(rotation));
-				translationStack.push((new THREE.Vector3(0,0,0)).copy(translation));
-			break;
-			case "]":
-				currentPosition = positionStack.pop();
-				rotation = rotationStack.pop();
-				translation = translationStack.pop();
-				break;
-			default:
-				currentPosition = currentPosition;
-		}
-
 		newAxiom = newAxiom + ((rules[axiom[i]] == null) ? axiom[i] : rules[axiom[i]]);
-
 	}
 
 	generateLSystem(newAxiom, generation - 1);
@@ -105,7 +110,7 @@ function createBranch(direction)
     		var z = branch.position.z + translation.z;
 
     		branch.position.set(x, y, z);
-    		currentPosition = new THREE.Vector3(x, y + branchHeight / 2.0, z);
+    		currentPosition = new THREE.Vector3(x + translation.x, y + translation.y, z + translation.z);
     		let matrix = branch.matrix;
     		branch.rotation.set(rotation.x, rotation.y, rotation.z, rotation.order);
     	break;
@@ -124,7 +129,7 @@ function createBranch(direction)
     		translation.z = ((branchHeight / 2.0) * Math.sin(rotation.x));
 
     		branch.position.set(x, y, z);
-    		currentPosition = new THREE.Vector3(x, y, z);
+    		currentPosition = new THREE.Vector3(x, y + translation.y, z + translation.z);
     	break;
     	case 3:
     		branch.material.color.setHex(0xfff200); // Yellow
@@ -141,7 +146,7 @@ function createBranch(direction)
     		translation.z = ((branchHeight / 2.0) * Math.sin(rotation.x));
 
 				branch.position.set(x, y, z);
-    		currentPosition = new THREE.Vector3(x, y, z);
+    		currentPosition = new THREE.Vector3(x, y + translation.y, z + translation.z);
     	break;
     	case 4:
     		branch.material.color.setHex(0xb85fb8); // Purple
@@ -159,7 +164,7 @@ function createBranch(direction)
     		translation.y = ((branchHeight / 2.0) * Math.cos(rotation.z));
 
 				branch.position.set(x, y, z);
-    		currentPosition = new THREE.Vector3(x, y, z);
+    		currentPosition = new THREE.Vector3(x + translation.x, y + translation.y, z);
     	break;
     	case 5:
     		branch.material.color.setHex(0x784c17); // Brown
@@ -177,7 +182,7 @@ function createBranch(direction)
     		translation.y = ((branchHeight / 2.0) * Math.cos(rotation.z));
 
     		branch.position.set(x, y, z);
-    		currentPosition = new THREE.Vector3(x, y, z);
+    		currentPosition = new THREE.Vector3(x + translation.x, y + translation.y, z);
     	default:
     		branch = branch;
     }
