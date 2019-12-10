@@ -18,9 +18,12 @@
   <script>
   "use strict";
 	let scene, camera, renderer, cameraControls;
-  let group =new THREE.Group();
+  let trees = [];
 	let WIDTH  = window.innerWidth;
 	let HEIGHT = window.innerHeight;
+  let snowThreshold = 2.25;
+  let rockThreshold = 1.5;
+  let planeOffset = -10.0;
 
   var clock = new THREE.Clock();
 
@@ -49,16 +52,64 @@
     let trump_texture = textureLoader.load('./textures/trump-angry.jpg', function (texture) { render(); });
 
     let geometry = new THREE.PlaneGeometry(width, length, segmentLength, segmentLength);
+    geometry.rotateX(Math.PI / -2.0);
+
     let heightMap = TerrainGeneration(segmentLength, 50);
     let index = 0;
-
+    let treeCnt = 0;
+    let terrain_group = new THREE.Group();
     // set vertex heights based on height map
     for (var i = 0; i <= segmentLength; i++)
     {
       for (var j = 0; j <= segmentLength; j++)
       {
-        geometry.vertices[index].z = heightMap[i][j];
+        geometry.vertices[index].y = heightMap[i][j];
         index++;
+
+        if((heightMap[i][j] < snowThreshold) && (heightMap[i][j] < rockThreshold) && (treeCnt <= 5))
+        {
+          treeCnt++;
+          console.log((i - (width / 2)) + ", " + (heightMap[i][j] + planeOffset) + ", " + (j - (length / 2)));
+          console.log(heightMap[i][j]);
+          initTree(0, 0, 0);
+
+          var treeLoc = new THREE.Vector3((i - (width / 2)), heightMap[i][j] + planeOffset, (j - (length / 2)));
+
+          generateLSystem("F", 2);
+          let branches = getBranches();
+
+          var addBranch = function (branch, index, arr) {
+            let group1 = new THREE.Group();
+            let group2 = new THREE.Group();
+
+            if (index != 0)
+              group2.add(branch.clone());
+
+            console.log("added branch");
+
+            group1.add(branch.clone());
+            group2.rotation.set(0, Math.PI/2.0, 0, "XYZ");
+
+            trees.push(new THREE.Group());
+
+            trees[trees.length - 1].add(group1);
+            trees[trees.length - 1].add(group2);
+
+            group1.position.set(treeLoc.x,treeLoc.y,treeLoc.z);
+            group2.position.set(treeLoc.x,treeLoc.y,treeLoc.z)
+           // trees[trees.length - 1].position.set(100, 100, 100);
+            console.log(treeLoc.x);
+
+            scene.add(group1);
+            scene.add(group2);
+            scene.add(trees[trees.length - 1]);
+          }
+
+          branches.forEach(addBranch);
+          // group.rotation.set(0, Math.PI/2.0,, 0, "XYZ");
+          
+        }
+        
       }
     }
 
@@ -82,6 +133,14 @@
       },
       skyLight: {
         value: sky
+      },
+
+      snowThreshold: {
+        value: snowThreshold
+      },
+
+      rockThreshold: {
+        value: rockThreshold
       }
     };
 
@@ -94,8 +153,7 @@
     let material = new THREE.MeshBasicMaterial( { map: rock_texture });
     let plane = new THREE.Mesh(geometry, material2);
 
-    plane.rotation.x = THREE.Math.degToRad(-90);
-    plane.position.set(0, -10, 0);
+    plane.position.set(0, planeOffset, 0);
     scene.add(plane);
 
     let directionalLight = new THREE.DirectionalLight(
@@ -105,21 +163,6 @@
     scene.add(directionalLight)
     //scene.fog = new THREE.FogExp2(0xe3e1e1, .06);
 
-    initTree(new THREE.Vector3(0, 0, 0));
-    generateLSystem("F", 2);
-    let branches = getBranches();
-
-    var addBranch = function (branch, index, arr) {
-      if (index != 0)
-        group.add(branch.clone());
-      console.log("added branch");
-      scene.add(branch);
-    }
-
-    branches.forEach(addBranch);
-    // group.rotation.set(0, Math.PI/2.0,, 0, "XYZ");
-    scene.add(group);
-    group.rotation.set(0, Math.PI/2.0, 0, "XYZ");
   }
 
 	function initCamera() {

@@ -6,6 +6,8 @@ function getFragmentShader() {
     uniform sampler2D rock;
     uniform sampler2D grass;
     uniform sampler2D snow;
+    uniform float snowThreshold;
+    uniform float rockThreshold;
 
     varying vec2 vUV;
     varying vec3 incidentLight;
@@ -17,9 +19,9 @@ function getFragmentShader() {
       vec3 snowColor = texture2D(snow, vUV).rgb;
       vec3 textureColor;
 
-      if (vertexPosition.z >= 2.25) {
+      if (vertexPosition.y >= snowThreshold) {
         textureColor = snowColor;
-      } else if (vertexPosition.z >= 1.5) {
+      } else if (vertexPosition.y >= rockThreshold) {
         textureColor = rockColor;
       } else {
         textureColor = grassColor;
