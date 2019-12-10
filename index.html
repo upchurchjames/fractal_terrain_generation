@@ -75,11 +75,11 @@
           //console.log("expected height: " + (geometry.vertices[index].y + planeOffset));
           //console.log((i - (width / 2)) + ", " + (geometry.vertices[index].y + planeOffset) + ", " + (j - (length / 2)));
           //console.log(heightMap[i][j]);
-          
+
 
           var treeLoc = new THREE.Vector3((geometry.vertices[index].x), geometry.vertices[index].y + planeOffset, (geometry.vertices[index].z));
 
-          
+
 
           var addBranch = function (branch, index, arr) {
             let group1 = new THREE.Group();
@@ -108,10 +108,10 @@
 
           branches.forEach(addBranch);
           // group.rotation.set(0, Math.PI/2.0,, 0, "XYZ");
-          
+
         }
 
-        index++;     
+        index++;
       }
     }
 

@@ -33,7 +33,7 @@ function getFragmentShader() {
       }
 
       dist = abs(viewSpace.z);
-      
+
       fogFactor = 1.0 / exp(dist * fogDensity);
       fogFactor = clamp(fogFactor, 0.0, 1.0);
       vec3 color = mix(skyLight, incidentLight * textureColor, fogFactor);
