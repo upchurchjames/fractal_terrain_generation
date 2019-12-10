@@ -21,8 +21,6 @@
   let trees = [];
 	let WIDTH  = window.innerWidth;
 	let HEIGHT = window.innerHeight;
-  let snowThreshold = 2.25;
-  let rockThreshold = 1.5;
   let planeOffset = -10.0;
 
   var clock = new THREE.Clock();
@@ -59,6 +57,11 @@
     let index = 0;
     let treeCnt = 0;
     let terrain_group = new THREE.Group();
+    let grassPercentage = (grass / (grass + snow + rock)) * 100;
+
+    initTree(new THREE.Vector3(0, 0, 0));
+    generateLSystem("F", 2);
+          let branches = getBranches();
     // set vertex heights based on height map
     for (var i = 0; i <= segmentLength; i++)
     {
@@ -66,18 +69,17 @@
       {
         geometry.vertices[index].y = heightMap[i][j];
 
-        if((heightMap[i][j] < snowThreshold) && (heightMap[i][j] < rockThreshold) && (treeCnt <= 5))
+        if((heightMap[i][j] < snowThreshold) && (heightMap[i][j] < rockThreshold) && (treeCnt <= ((length * width) * (grassPercentage * 0.001))) && ((Math.floor(Math.random() * 100)) % 100 == 0))
         {
           treeCnt++;
           //console.log("expected height: " + (geometry.vertices[index].y + planeOffset));
-          console.log((i - (width / 2)) + ", " + (geometry.vertices[index].y + planeOffset) + ", " + (j - (length / 2)));
-          console.log(heightMap[i][j]);
-          initTree(new THREE.Vector3(0, 0, 0));
+          //console.log((i - (width / 2)) + ", " + (geometry.vertices[index].y + planeOffset) + ", " + (j - (length / 2)));
+          //console.log(heightMap[i][j]);
+          
 
           var treeLoc = new THREE.Vector3((geometry.vertices[index].x), geometry.vertices[index].y + planeOffset, (geometry.vertices[index].z));
 
-          generateLSystem("F", 2);
-          let branches = getBranches();
+          
 
           var addBranch = function (branch, index, arr) {
             let group1 = new THREE.Group();
@@ -85,8 +87,6 @@
 
             if (index != 0)
               group2.add(branch.clone());
-
-            console.log("added branch");
 
             group1.add(branch.clone());
             group2.rotation.set(0, Math.PI/2.0, 0, "XYZ");
@@ -143,7 +143,8 @@
 
       rockThreshold: {
         value: rockThreshold
-      }
+      },
+
     };
 
     let material2 = new THREE.RawShaderMaterial({
@@ -151,6 +152,8 @@
       vertexShader: getVertexShader(),
       uniforms: uniforms
     });
+
+    //material2.fog = true;
 
     let material = new THREE.MeshBasicMaterial( { map: rock_texture });
     let plane = new THREE.Mesh(geometry, material2);
@@ -163,7 +166,7 @@
 		directionalLight.position.set(0, 50, 0).normalize();
     directionalLight.target = plane;
     scene.add(directionalLight)
-    //scene.fog = new THREE.FogExp2(0xe3e1e1, .06);
+    scene.fog = new THREE.FogExp2(0xe3e1e1, .06);
 
   }
 
