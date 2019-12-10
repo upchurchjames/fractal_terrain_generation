@@ -4,14 +4,217 @@
   <title>Fractals</title>
 </head>
 <body>
-  <h1 align="center">Fractals</h1>
   <script src="https://threejs.org/build/three.min.js"></script>
-	<script src="https://threejs.org/examples/js/controls/FirstPersonControls.js"></script>
+  <script src="https://threejs.org/examples/js/controls/FirstPersonControls.js"></script>
   <script src="https://threejs.org/examples/js/loaders/OBJLoader.js"></script>
 	<script src="https://threejs.org/examples/js/loaders/MTLLoader.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/dat-gui/0.7.6/dat.gui.min.js"></script>
-  <script src="./shaders/vertexShader.js" type="x-shader/x-vertex" id="vertexShader"></script>
-  <script src="./shaders/fragmentShader.js" type="x-shader/x-fragment" id="fragShader"></script>
-  <script src="./terrain.js"></script>
+
+  <script src="./shaders/vertexShader.js" type="text/javascript"></script>
+  <script src="./shaders/fragmentShader.js" type="text/javascript"></script>
+  <script src="./scripts/buildTree.js" type="text/javascript"></script>
+  <script src="./scripts/terrain.js" type="text/javascript"></script>
+
+  <script>
+  "use strict";
+	let scene, camera, renderer, cameraControls;
+  let trees = [];
+	let WIDTH  = window.innerWidth;
+	let HEIGHT = window.innerHeight;
+  let planeOffset = -10.0;
+
+  var clock = new THREE.Clock();
+
+	function init() {
+		scene = new THREE.Scene();
+		initRenderer();
+		initScene();
+    eventHandlers();
+	}
+
+	function initRenderer() {
+		renderer = new THREE.WebGLRenderer({ antialias: true });
+		renderer.setSize(WIDTH, HEIGHT);
+    renderer.setClearColor(0xe3e1e1, 1);
+		document.body.appendChild(renderer.domElement);
+	}
+
+	function initScene() {
+
+		initCamera();
+    let textureLoader = new THREE.TextureLoader();
+    let rock_texture = textureLoader.load('./textures/rock2.jpg', function (texture) { render(); });
+    let grass_texture = textureLoader.load('./textures/grass.jpg', function (texture) { render(); });
+    let snow_texture = textureLoader.load('./textures/snow.jpg', function (texture) { render(); });
+
+    let trump_texture = textureLoader.load('./textures/trump-angry.jpg', function (texture) { render(); });
+
+    let geometry = new THREE.PlaneGeometry(width, length, segmentLength, segmentLength);
+    geometry.rotateX(Math.PI / -2.0);
+    geometry.rotateY(Math.PI / 2.0);
+
+    let heightMap = TerrainGeneration(segmentLength, 50);
+    let index = 0;
+    let treeCnt = 0;
+    let terrain_group = new THREE.Group();
+    let grassPercentage = (grass / (grass + snow + rock)) * 100;
+
+    initTree(new THREE.Vector3(0, 0, 0));
+    generateLSystem("F", 2);
+          let branches = getBranches();
+    // set vertex heights based on height map
+    for (var i = 0; i <= segmentLength; i++)
+    {
+      for (var j = 0; j <= segmentLength; j++)
+      {
+        geometry.vertices[index].y = heightMap[i][j];
+
+        if((heightMap[i][j] < snowThreshold) && (heightMap[i][j] < rockThreshold) && (treeCnt <= ((length * width) * (grassPercentage * 0.001))) && ((Math.floor(Math.random() * 100)) % 100 == 0))
+        {
+          treeCnt++;
+          //console.log("expected height: " + (geometry.vertices[index].y + planeOffset));
+          //console.log((i - (width / 2)) + ", " + (geometry.vertices[index].y + planeOffset) + ", " + (j - (length / 2)));
+          //console.log(heightMap[i][j]);
+          
+
+          var treeLoc = new THREE.Vector3((geometry.vertices[index].x), geometry.vertices[index].y + planeOffset, (geometry.vertices[index].z));
+
+          
+
+          var addBranch = function (branch, index, arr) {
+            let group1 = new THREE.Group();
+            let group2 = new THREE.Group();
+
+            if (index != 0)
+              group2.add(branch.clone());
+
+            group1.add(branch.clone());
+            group2.rotation.set(0, Math.PI/2.0, 0, "XYZ");
+
+            trees.push(new THREE.Group());
+
+            trees[trees.length - 1].add(group1);
+            trees[trees.length - 1].add(group2);
+
+            group1.position.set(treeLoc.x,treeLoc.y,treeLoc.z);
+            group2.position.set(treeLoc.x,treeLoc.y,treeLoc.z)
+           // trees[trees.length - 1].position.set(100, 100, 100);
+            //console.log(treeLoc.x);
+
+            scene.add(group1);
+            scene.add(group2);
+            scene.add(trees[trees.length - 1]);
+          }
+
+          branches.forEach(addBranch);
+          // group.rotation.set(0, Math.PI/2.0,, 0, "XYZ");
+          
+        }
+
+        index++;     
+      }
+    }
+
+    let up = new THREE.Vector3(0, 1, 0);
+    let sky = new THREE.Vector3(0.887, 0.879, 0.879);
+    let uniforms = {
+      upDirection: {
+        value: up
+      },
+      snow: {
+        type: "t",
+        value: snow_texture
+      },
+      rock: {
+        type: "t",
+        value: rock_texture
+      },
+      grass: {
+        type: "t",
+        value: grass_texture
+      },
+      skyLight: {
+        value: sky
+      },
+
+      snowThreshold: {
+        value: snowThreshold
+      },
+
+      rockThreshold: {
+        value: rockThreshold
+      },
+
+    };
+
+    let material2 = new THREE.RawShaderMaterial({
+      fragmentShader: getFragmentShader(),
+      vertexShader: getVertexShader(),
+      uniforms: uniforms
+    });
+
+    //material2.fog = true;
+
+    let material = new THREE.MeshBasicMaterial( { map: rock_texture });
+    let plane = new THREE.Mesh(geometry, material2);
+
+    plane.position.set(0, planeOffset, 0);
+    scene.add(plane);
+
+    let directionalLight = new THREE.DirectionalLight(
+			0xffffff,.9);
+		directionalLight.position.set(0, 50, 0).normalize();
+    directionalLight.target = plane;
+    scene.add(directionalLight)
+    scene.fog = new THREE.FogExp2(0xe3e1e1, .03);
+
+  }
+
+	function initCamera() {
+		camera = new THREE.PerspectiveCamera(50, WIDTH / HEIGHT, 1, 20000);
+		camera.position.set(0, 3.5, 5);
+		camera.lookAt(scene.position);
+		cameraControls = new THREE.FirstPersonControls (
+			camera, renderer.domElement
+		);
+
+		cameraControls.movementSpeed = 12;
+    cameraControls.lookSpeed = .08;
+	}
+
+  function eventHandlers() {
+    handleWindowResize();
+  }
+
+	function handleWindowResize(){
+		window.addEventListener (
+			"resize",
+			function () {
+				WIDTH = window.innerWidth ;
+				HEIGHT = window.innerHeight;
+				renderer.setSize(WIDTH,HEIGHT);
+				camera.aspect = WIDTH/HEIGHT;
+				camera.updateProjectionMatrix();
+        cameraControls.handleResize();
+        render();
+			}
+		);
+	}
+
+  function animate() {
+    requestAnimationFrame( animate );
+    render();
+  }
+
+  function render() {
+
+    renderer.render(scene, camera);
+     cameraControls.update(clock.getDelta());
+  }
+
+	init();
+	animate();
+  </script>
+
 </body>
 </html>
