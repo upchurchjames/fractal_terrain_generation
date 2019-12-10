@@ -53,6 +53,7 @@
 
     let geometry = new THREE.PlaneGeometry(width, length, segmentLength, segmentLength);
     geometry.rotateX(Math.PI / -2.0);
+    geometry.rotateY(Math.PI / 2.0);
 
     let heightMap = TerrainGeneration(segmentLength, 50);
     let index = 0;
@@ -64,16 +65,16 @@
       for (var j = 0; j <= segmentLength; j++)
       {
         geometry.vertices[index].y = heightMap[i][j];
-        index++;
 
         if((heightMap[i][j] < snowThreshold) && (heightMap[i][j] < rockThreshold) && (treeCnt <= 5))
         {
           treeCnt++;
-          console.log((i - (width / 2)) + ", " + (heightMap[i][j] + planeOffset) + ", " + (j - (length / 2)));
+          //console.log("expected height: " + (geometry.vertices[index].y + planeOffset));
+          console.log((i - (width / 2)) + ", " + (geometry.vertices[index].y + planeOffset) + ", " + (j - (length / 2)));
           console.log(heightMap[i][j]);
-          initTree(0, 0, 0);
+          initTree(new THREE.Vector3(0, 0, 0));
 
-          var treeLoc = new THREE.Vector3((i - (width / 2)), heightMap[i][j] + planeOffset, (j - (length / 2)));
+          var treeLoc = new THREE.Vector3((geometry.vertices[index].x), geometry.vertices[index].y + planeOffset, (geometry.vertices[index].z));
 
           generateLSystem("F", 2);
           let branches = getBranches();
@@ -98,7 +99,7 @@
             group1.position.set(treeLoc.x,treeLoc.y,treeLoc.z);
             group2.position.set(treeLoc.x,treeLoc.y,treeLoc.z)
            // trees[trees.length - 1].position.set(100, 100, 100);
-            console.log(treeLoc.x);
+            //console.log(treeLoc.x);
 
             scene.add(group1);
             scene.add(group2);
@@ -109,7 +110,8 @@
           // group.rotation.set(0, Math.PI/2.0,, 0, "XYZ");
           
         }
-        
+
+        index++;     
       }
     }
 
