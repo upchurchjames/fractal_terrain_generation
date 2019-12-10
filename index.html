@@ -18,7 +18,7 @@
   <script>
   "use strict";
 	let scene, camera, renderer, cameraControls;
-
+  let group =new THREE.Group();
 	let WIDTH  = window.innerWidth;
 	let HEIGHT = window.innerHeight;
 
@@ -106,10 +106,20 @@
     //scene.fog = new THREE.FogExp2(0xe3e1e1, .06);
 
     initTree(new THREE.Vector3(0, 0, 0));
-    generateLSystem("F", 3);
+    generateLSystem("F", 2);
     let branches = getBranches();
-    branches.every(branch => scene.add(branch));
 
+    var addBranch = function (branch, index, arr) {
+      if (index != 0)
+        group.add(branch.clone());
+      console.log("added branch");
+      scene.add(branch);
+    }
+
+    branches.forEach(addBranch);
+    // group.rotation.set(0, Math.PI/2.0,, 0, "XYZ");
+    scene.add(group);
+    group.rotation.set(0, Math.PI/2.0, 0, "XYZ");
   }
 
 	function initCamera() {
@@ -149,6 +159,7 @@
   }
 
   function render() {
+
     renderer.render(scene, camera);
      cameraControls.update(clock.getDelta());
   }

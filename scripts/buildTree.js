@@ -12,7 +12,7 @@ let branchHeight = 1.5;
 let trunkHeight = 1.5;
 let radialSegments = 32.0;
 let rules = {
-				"F":"F[-F][+F][/F][*F]"
+				"F":"F[-F][+F]"
 				// "F":"[-[-][+][/][*]][+[-][+][/][*]][/[-][+][/][*]][*[-][+][/][*]]",
 				// "-":"-[-][+][/][*]",
 				// "+":"+[-][+][/][*]",
@@ -22,7 +22,7 @@ let rules = {
 let branches = [];
 let textureLoader;
 let barkTexture;
-let angle = Math.PI/3;
+let angle = Math.PI/7;
 let rotation = new THREE.Euler(0, 0, 0, 'XYZ');
 let translation = new THREE.Vector3(0, (branchHeight / 2.0), 0);
 
@@ -37,7 +37,7 @@ function generateLSystem(axiom, generation)
 {
 	var newAxiom = "";
 	var i;
-
+	// F[-F][+F][-F[-F][+F]][+F[-F][+F]]
 	if(generation <= 0)
 	{
 		for(i = 0; i < axiom.length; i++)
@@ -52,12 +52,6 @@ function generateLSystem(axiom, generation)
 				break;
 				case "+":
 					createBranch(3);
-				break;
-				case "/":
-					createBranch(4);
-				break;
-				case "*":
-					createBranch(5);
 				break;
 				case "[":
 					positionStack.push((new THREE.Vector3(0,0,0)).copy(currentPosition));
@@ -78,7 +72,7 @@ function generateLSystem(axiom, generation)
 		return;
 	}
 
-	
+
 	for(i = 0; i < axiom.length; i++)
 	{
 		newAxiom = newAxiom + ((rules[axiom[i]] == null) ? axiom[i] : rules[axiom[i]]);
@@ -89,21 +83,17 @@ function generateLSystem(axiom, generation)
 
 function createBranch(direction)
 {
-	let branchGeometry;
-
-	if(direction == 1)
-		branchGeometry = new THREE.CylinderGeometry(cylinderRadiusTopTrunk, cylinderRadiusBottomTrunk, trunkHeight, radialSegments);
-	else
-		branchGeometry = new THREE.CylinderGeometry(cylinderRadiusTopBranch, cylinderRadiusBottomBranch, branchHeight, radialSegments);
+	let branchGeometry = new THREE.CylinderGeometry(cylinderRadiusTopBranch, cylinderRadiusBottomBranch, branchHeight, radialSegments);
 
 	let branchMaterial = new THREE.MeshBasicMaterial( { map: bark_texture });
-    let branch = new THREE.Mesh(branchGeometry, branchMaterial);
+
+  let branch = new THREE.Mesh(branchGeometry, branchMaterial);
 
 	branch.position.set(currentPosition.x, currentPosition.y, currentPosition.z);
     switch(direction)
     {
     	case 1:
-    		branch.material.color.setHex(0xff0000); // Red
+    		//branch.material.color.setHex(0xff0000); // Red
 
     		var x = branch.position.x + translation.x;
     		var y = branch.position.y + translation.y;
@@ -115,7 +105,7 @@ function createBranch(direction)
     		branch.rotation.set(rotation.x, rotation.y, rotation.z, rotation.order);
     	break;
     	case 2:
-    		branch.material.color.setHex(0x0022ff); // Blue
+    		//branch.material.color.setHex(0x0022ff); // Blue
 
     		rotation.x += angle;
     		rotation.order = "XYZ";
@@ -132,7 +122,7 @@ function createBranch(direction)
     		currentPosition = new THREE.Vector3(x, y + translation.y, z + translation.z);
     	break;
     	case 3:
-    		branch.material.color.setHex(0xfff200); // Yellow
+    		//branch.material.color.setHex(0xfff200); // Yellow
 
     		rotation.x += (-angle);
     		rotation.order = "XYZ";
@@ -148,46 +138,10 @@ function createBranch(direction)
 				branch.position.set(x, y, z);
     		currentPosition = new THREE.Vector3(x, y + translation.y, z + translation.z);
     	break;
-    	case 4:
-    		branch.material.color.setHex(0xb85fb8); // Purple
-
-    		rotation.z += (-angle);
-    		rotation.y += (Math.PI / 2.0);
-    		rotation.order = "ZYX";
-			branch.rotation.set(rotation.x, rotation.y, rotation.z, rotation.order);
-
-    		var x = branch.position.x + (((branchHeight / 2.0) * -Math.sin(rotation.z))) * Math.sin(rotation.y);
-    		var y = branch.position.y + ((branchHeight / 2.0) * Math.cos(rotation.z));
-    		var z = branch.position.z;
-
-    		translation.x = (((branchHeight / 2.0) * -Math.sin(rotation.z))) * Math.sin(rotation.y);
-    		translation.y = ((branchHeight / 2.0) * Math.cos(rotation.z));
-
-				branch.position.set(x, y, z);
-    		currentPosition = new THREE.Vector3(x + translation.x, y + translation.y, z);
-    	break;
-    	case 5:
-    		branch.material.color.setHex(0x784c17); // Brown
-
-    		rotation.z += angle;
-    		rotation.y += (Math.PI / 2.0);
-    		rotation.order = "ZYX";
-    		branch.rotation.set(rotation.x, rotation.y, rotation.z, rotation.order);
-
-    		var x = branch.position.x + (((branchHeight / 2.0) * -Math.sin(rotation.z))) * Math.sin(rotation.y);
-    		var y = branch.position.y + ((branchHeight / 2.0) * Math.cos(rotation.z));
-    		var z = branch.position.z;
-
-    		translation.x = (((branchHeight / 2.0) * -Math.sin(rotation.z))) * Math.sin(rotation.y);
-    		translation.y = ((branchHeight / 2.0) * Math.cos(rotation.z));
-
-    		branch.position.set(x, y, z);
-    		currentPosition = new THREE.Vector3(x + translation.x, y + translation.y, z);
     	default:
     		branch = branch;
     }
-
-    branches.push(branch);
+		branches.push(branch);
 }
 
 function getBranches()
