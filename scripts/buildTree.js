@@ -3,13 +3,11 @@ let rotationStack = [];
 let translationStack = [];
 let currentPosition;
 
-let cylinderRadiusTopTrunk = .05;
-let cylinderRadiusBottomTrunk = .06;
-let cylinderRadiusTopBranch = .05;
-let cylinderRadiusBottomBranch = .06;
+let branchRadiusTop = .065;
+let branchRadiusBottom = .07;
 
-let branchHeight = 1.5;
-let trunkHeight = 1.5;
+let branchHeight = .22;
+let trunkHeight = .22;
 let radialSegments = 32.0;
 let rules = {
 				"F":"F[-F][+F]"
@@ -46,18 +44,18 @@ function generateLSystem(axiom, generation)
 			{
 				case "F":
 					createBranch(1);
-				break;
+					break;
 				case "-":
 					createBranch(2);
-				break;
+					break;
 				case "+":
 					createBranch(3);
-				break;
+					break;
 				case "[":
 					positionStack.push((new THREE.Vector3(0,0,0)).copy(currentPosition));
 					rotationStack.push((new THREE.Euler(0, 0, 0, 'XYZ')).copy(rotation));
 					translationStack.push((new THREE.Vector3(0,0,0)).copy(translation));
-				break;
+					break;
 				case "]":
 					currentPosition = positionStack.pop();
 					rotation = rotationStack.pop();
@@ -66,12 +64,10 @@ function generateLSystem(axiom, generation)
 				default:
 					currentPosition = currentPosition;
 			}
-
 		}
 
 		return;
 	}
-
 
 	for(i = 0; i < axiom.length; i++)
 	{
@@ -83,8 +79,36 @@ function generateLSystem(axiom, generation)
 
 function createBranch(direction)
 {
-	let branchGeometry = new THREE.CylinderGeometry(cylinderRadiusTopBranch, cylinderRadiusBottomBranch, branchHeight, radialSegments);
+	let branchGeometry;
 
+	if (positionStack.length <= 1)
+	{
+		branchGeometry = new THREE.CylinderGeometry(branchRadiusTop,
+																								branchRadiusBottom,
+																								branchHeight,
+																								radialSegments);
+	}
+	else if (positionStack.length <= 2)
+	{
+		branchGeometry = new THREE.CylinderGeometry(branchRadiusTop - .02,
+																								branchRadiusBottom,
+																								branchHeight,
+																								radialSegments);
+	}
+	else if (positionStack.length <= 3)
+	{
+		branchGeometry = new THREE.CylinderGeometry(branchRadiusTop - Math.random()*.02,
+																								branchRadiusBottom - Math.random()*.019,
+																								branchHeight,
+																								radialSegments);
+	}
+	else
+	{
+		branchGeometry = new THREE.CylinderGeometry(branchRadiusTop - Math.random()*.04,
+																								branchRadiusBottom - Math.random()*.039,
+																								branchHeight,
+																								radialSegments);
+	}
 	let branchMaterial = new THREE.MeshBasicMaterial( { map: bark_texture });
 
   let branch = new THREE.Mesh(branchGeometry, branchMaterial);
