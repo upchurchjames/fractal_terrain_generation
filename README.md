@@ -35,3 +35,8 @@ Free images from pexels.com for the texture of the trees, plants, and landscape 
 
 # Implementation
 Shaders will be used for the texturization and lighting for the landscape, plants, and trees. The random midpoint displacement algorithm will be utilized to create the geometry of the landscape. The Lindenmayer system will be used to create the geometry for the trees and plants. The landscape, trees, and plants will all be generated in real time. There will be cameras giving the user an option to hover over the scene as everything is being generated.
+
+# Custom Shaders
+For this project, custom shaders were written to dynamically texture the plane. Using specific ranges, a grass texture was applied to the lowest areas of the generated height map, specifically those vertices with a height lower than 1.5. A rock texture was used for the medium to high values in the height map, between 1.5 and 2.25. A snow texture was used for the highest portions of the height map, with z-components higher than 2.25.
+
+Fog was also incorporated into the project to mask the edge of the generated plane. Because custom shaders were used to texture the landscape, ThreeJS' fog material could not be applied to the landscape. Therefore, the custom shaders include calculations utilizing exponential fog to give the landscape a fog-like appearance to the scene. ThreeJS fog is still used to give the trees a fog-like appearance.
