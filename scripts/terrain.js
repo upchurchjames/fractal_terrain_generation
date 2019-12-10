@@ -3,6 +3,11 @@ let width = 256;
 let length = 256;
 let segmentLength = 512;
 
+let snowThreshold = 2.25;
+let rockThreshold = 1.5;
+
+let snow = 0, rock = 0, grass = 0;
+
 function TerrainGeneration(segments, smoothingFactor) {
 	let terrain = new Array();
 
@@ -36,6 +41,13 @@ function TerrainGeneration(segments, smoothingFactor) {
 					average += 2*smoothingFactor*Math.random()-smoothingFactor;
 
 					terrain[x+half][y+half] = average;
+
+					if (average > 2.25)
+						snow++;
+					else if (average > 1.5)
+						rock++;
+					else
+						grass++;
 				}
 			}
 
@@ -56,6 +68,13 @@ function TerrainGeneration(segments, smoothingFactor) {
 						terrain[segments][y] = average;
 					if(y === 0)
 						terrain[x][segments] = average;
+
+						if (average > 2.25)
+							snow += 2;
+						else if (average > 1.5)
+							rock += 2;
+						else
+							grass += 2;
 				}
 			}
 		}
